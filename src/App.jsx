@@ -58,7 +58,7 @@ function App() {
   });
 
   return (
-    <div className="bg-light min-vh-100">
+    <div className="bg-white min-vh-100">
       <Navbar />
 
       <main className="container my-4">
