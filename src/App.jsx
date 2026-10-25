@@ -1,122 +1,91 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState } from "react";
+import Navbar from "./components/Navbar";
+import SearchForm from "./components/SearchForm";
+import ItemList from "./components/ItemList";
+import AddForm from "./components/AddForm";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [items, setItems] = useState([
+    {
+      id: 1,
+      nama: "Proyektor Epson EB-X400",
+      kategori: "Elektronik",
+      pemilik: "Rakendra Aznil",
+      deskripsi:
+        "Proyektor Epson EB-X400 berkualitas tinggi untuk presentasi bisnis dan pendidikan.",
+      gambar:
+        "https://tokocentralpc.com/wp-content/uploads/2024/10/Untitled-222.jpg",
+      status: true,
+    },
+    {
+      id: 2,
+      nama: "Tripod Kamera Takara",
+      kategori: "Elektronik",
+      pemilik: "Rakendra Aznil",
+      deskripsi:
+        "Tripod stabil dan ringan, cocok untuk kebutuhan fotografi dan videografi tugas kuliah.",
+      gambar:
+        "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=500&q=80",
+      status: false,
+    },
+    {
+      id: 3,
+      nama: "Wireless Microphone",
+      kategori: "Elektronik",
+      pemilik: "Rakendra Aznil",
+      deskripsi:
+        "Mikrofon tanpa kabel jernih untuk keperluan seminar, acara organisasi, atau presentasi.",
+      gambar:
+        "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=500&q=80",
+      status: true,
+    },
+  ]);
+
+  const [keyword, setKeyword] = useState("");
+  const [selectedKategori, setSelectedKategori] = useState("");
+
+  const handleAddItem = (newItem) => {
+    setItems([newItem, ...items]);
+  };
+
+  const filteredItems = items.filter((item) => {
+    const matchKeyword = item.nama
+      .toLowerCase()
+      .includes(keyword.toLowerCase());
+    const matchKategori =
+      selectedKategori === "" || item.kategori === selectedKategori;
+    return matchKeyword && matchKategori;
+  });
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+    <div className="bg-light min-vh-100">
+      <Navbar />
+
+      <main className="container my-4">
+        <div className="mb-4">
+          <h2 className="h4 text-primary fw-bold">Katalog Peminjaman Barang</h2>
+          <p className="text-muted">
+            Total Barang Tersedia: <strong>{filteredItems.length}</strong> item
           </p>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
+        <SearchForm
+          keyword={keyword}
+          setKeyword={setKeyword}
+          selectedKategori={selectedKategori}
+          setSelectedKategori={setSelectedKategori}
+        />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        <AddForm onAddItem={handleAddItem} />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        <ItemList items={filteredItems} />
+      </main>
+
+      <footer className="bg-dark text-white text-center py-3 mt-5">
+        <p className="mb-0">&copy; 2026 PinjamBarang - Proyek React Dasar</p>
+      </footer>
+    </div>
+  );
 }
 
-export default App
+export default App;
