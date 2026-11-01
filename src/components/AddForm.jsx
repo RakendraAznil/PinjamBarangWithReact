@@ -5,28 +5,56 @@ export default function AddForm({ onAddItem }) {
   const [kategori, setKategori] = useState("Elektronik");
   const [pemilik, setPemilik] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!nama.trim() || !pemilik.trim()) return;
 
-    const newItem = {
-      id: Date.now(),
-      nama,
-      kategori,
-      pemilik,
-      deskripsi: deskripsi || "Tidak ada deskripsi tambahan.",
-      gambar:
-        "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=500&q=80",
-      status: true,
+    setIsSubmitting(true);
+
+    const newItemPayload = {
+      title: nama,
+      body: deskripsi || "Tidak ada deskripsi tambahan.",
+      userId: 1,
     };
 
-    onAddItem(newItem);
+    try {
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/posts",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newItemPayload),
+        },
+      );
 
-    // Reset Form
-    setNama("");
-    setPemilik("");
-    setDeskripsi("");
+      const data = await response.json();
+
+      const itemToSave = {
+        id: data.id + Date.now(),
+        nama: nama,
+        kategori: kategori,
+        pemilik: pemilik,
+        deskripsi: deskripsi || "Tidak ada deskripsi tambahan.",
+        gambar:
+          "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=500&q=80",
+        status: true,
+      };
+
+      onAddItem(itemToSave);
+
+      setNama("");
+      setPemilik("");
+      setDeskripsi("");
+      alert("Barang berhasil ditambahkan via POST API!");
+    } catch (err) {
+      alert(`Gagal menawarkan barang ke API server: ${err.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -42,7 +70,7 @@ export default function AddForm({ onAddItem }) {
               value={nama}
               onChange={(e) => setNama(e.target.value)}
               required
-              placeholder="Contoh: Kabel Roll"
+              placeholder="Contoh: Proyektor Epson"
             />
           </div>
           <div className="col-md-4">
@@ -78,8 +106,12 @@ export default function AddForm({ onAddItem }) {
             ></textarea>
           </div>
           <div className="col-12">
-            <button type="submit" className="btn btn-success">
-              Tambah ke Katalog
+            <button
+              type="submit"
+              className="btn btn-success"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Mengirim..." : "Tambah ke Katalog"}
             </button>
           </div>
         </div>
